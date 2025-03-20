@@ -106,16 +106,24 @@ export default function SpotifyLayout({ children }) {
         <div
           className={`p-4 flex items-center ${
             isCollapsed ? "justify-center" : "justify-between"
-          } transition-all duration-300`}
+          } transition-all duration-300 overflow-hidden`}
         >
-          {!isCollapsed && (
-            <div className="transition-opacity duration-300 ease-in-out">
-              <h1 className="text-2xl font-bold text-white">Keoni Burns</h1>
-              <p className="text-gray-400 text-sm">Portfolio</p>
-            </div>
-          )}
+          <div
+            className={`transition-all duration-300 ease-in-out ${
+              isCollapsed
+                ? "opacity-0 max-w-0 transform -translate-x-4"
+                : "opacity-100 max-w-full transform translate-x-0"
+            }`}
+            style={{
+              transitionDelay: isCollapsed ? "0ms" : "200ms",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+            }}
+          >
+            <h1 className="text-2xl font-bold text-white">Keoni Burns</h1>
+            <p className="text-gray-400 text-sm">Portfolio</p>
+          </div>
 
-          {/* Toggle button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-gray-400 hover:text-white p-1 rounded-md hover:bg-[#282828] transition-colors"
@@ -256,14 +264,26 @@ export default function SpotifyLayout({ children }) {
         </nav>
 
         <div
-          className={`mt-auto p-4 ${isCollapsed ? "flex justify-center" : ""}`}
+          className={`mt-auto p-4 ${
+            isCollapsed ? "flex justify-center" : ""
+          } transition-all duration-300`}
         >
-          <div className={`flex ${isCollapsed ? "flex-col" : ""} gap-2`}>
+          <div
+            className={`flex ${
+              isCollapsed ? "flex-col" : "flex-row"
+            } gap-2 transition-all duration-300 ease-in-out`}
+          >
             <a
               href="https://github.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white"
+              className={`text-gray-400 hover:text-white transition-all duration-300 ease-in-out ${
+                isCollapsed ? "opacity-100 scale-100" : "opacity-100 scale-100"
+              }`}
+              style={{
+                transitionDelay: isCollapsed ? `0ms` : `100ms`,
+                transform: isCollapsed ? `translateY(0px)` : `translateX(0px)`,
+              }}
             >
               <svg
                 className="w-5 h-5"
@@ -282,7 +302,13 @@ export default function SpotifyLayout({ children }) {
               href="https://linkedin.com/in/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white"
+              className={`text-gray-400 hover:text-white transition-all duration-300 ease-in-out ${
+                isCollapsed ? "opacity-100 scale-100" : "opacity-100 scale-100"
+              }`}
+              style={{
+                transitionDelay: isCollapsed ? `100ms` : `150ms`,
+                transform: isCollapsed ? `translateY(8px)` : `translateX(0px)`,
+              }}
             >
               <svg
                 className="w-5 h-5"
@@ -295,7 +321,13 @@ export default function SpotifyLayout({ children }) {
             </a>
             <a
               href="mailto:your.email@example.com"
-              className="text-gray-400 hover:text-white"
+              className={`text-gray-400 hover:text-white transition-all duration-300 ease-in-out ${
+                isCollapsed ? "opacity-100 scale-100" : "opacity-100 scale-100"
+              }`}
+              style={{
+                transitionDelay: isCollapsed ? `200ms` : `200ms`,
+                transform: isCollapsed ? `translateY(16px)` : `translateX(0px)`,
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
