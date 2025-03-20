@@ -8,7 +8,7 @@ import {
 } from "react-router";
 
 import "./app.css";
-import SpotifyLayout from "./components/Layout";
+import SpotifyLayout from "./components/Layout.tsx";
 
 export const links = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

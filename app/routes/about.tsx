@@ -19,7 +19,7 @@ export default function About() {
         <div className="md:w-1/3">
           <div className="bg-[#282828] rounded-lg overflow-hidden">
             <img
-              src="https://via.placeholder.com/400x500"
+              src="/me2.JPEG"
               alt="Your Name"
               className="w-full object-cover"
             />
@@ -28,21 +28,26 @@ export default function About() {
 
         <div className="md:w-2/3">
           <p className="mb-4 text-gray-300">
-            Hello! I'm [Your Name], a [Your Profession] based in [Your
-            Location]. I specialize in creating [what you do] that [the value
-            you provide].
+            Hello! I'm Keoni Burns, a Software Engineer based in Los Angeles. I
+            currently work in the compliance and time and attendance space, but
+            I have a love for Ai and embedded systems, specifically autonomous
+            navigation.
           </p>
 
           <p className="mb-4 text-gray-300">
-            My journey began with [your background/education] and I've been
-            passionate about [your field] for [number] years. I enjoy [your
-            interests related to your work] and am constantly expanding my
-            knowledge in [areas you're developing].
+            I currently work for Excalibur Security leading the initiative for a
+            proprietary time and attendance platform. I have been developing
+            this platform for the past 6 months with a small team of hungry
+            developers and our goal is to be a competitor alongside the likes of
+            workday and ukg. Previously I have worked across the tech stack and
+            in differing disciplines like mobile/web development, DevOps and
+            infrastructure, and project management.
           </p>
 
           <p className="mb-6 text-gray-300">
-            When I'm not coding, you can find me [your hobbies/interests outside
-            of work].
+            When I'm not coding, you can find me at the local pool hall with my
+            girlfriend or if its the season at heavenly or boreal shredding some
+            pow.
           </p>
 
           <div className="flex flex-wrap gap-4">
