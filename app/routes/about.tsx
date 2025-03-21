@@ -12,7 +12,7 @@ export function meta() {
 
 export default function About() {
   return (
-    <div className="max-w-4xl">
+    <div className="w-full max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">About Me</h1>
 
       <div className="flex flex-col md:flex-row gap-8 mb-10">
@@ -46,7 +46,7 @@ export default function About() {
 
           <p className="mb-6 text-gray-300">
             When I'm not coding, you can find me at the local pool hall with my
-            girlfriend or if its the season at heavenly or boreal shredding some
+            girlfriend or if it's the season at heavenly or boreal shredding some
             pow.
           </p>
 
@@ -73,26 +73,52 @@ export default function About() {
 
         <div className="bg-[#181818] p-6 rounded-lg mb-4">
           <div className="flex justify-between mb-2">
-            <h3 className="font-bold text-white">Company Name</h3>
-            <span className="text-gray-400">2020 - Present</span>
+            <h3 className="font-bold text-white">Excalibur Security Inc.</h3>
+            <span className="text-gray-400">September 2024 - Present</span>
           </div>
-          <h4 className="text-[#1DB954] mb-2">Senior Position</h4>
-          <p className="text-gray-300">
-            Description of your role, responsibilities, and key achievements. Be
-            sure to highlight specific projects and the impact your work had.
+          <h4 className="text-[#1DB954] mb-2">Full-Stack Software Engineer</h4>
+          <p className="text-gray-300">I lead the development of a scheduling and compliance platform, designing a secure, scalable architecture using React, Node.js, and PostgreSQL. I implemented authentication, access control, and DevOps practices to enhance reliability while building features that streamline payroll and scheduling.
           </p>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {["React", "Node.js", "PostgreSQL", "Docker Compose", "JWT", "CI/CD", "DevOps", "Role-Based Access Control (RBAC)", "Database Optimization", "Authentication"].map((tag, index) => (
+              <span key={index} className="bg-[#282828] text-gray-300 text-xs px-2 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-[#181818] p-6 rounded-lg mb-4">
+          <div className="flex justify-between mb-2">
+            <h3 className="font-bold text-white">Liatrio</h3>
+            <span className="text-gray-400">June 2023 - November 2023</span>
+          </div>
+          <h4 className="text-[#1DB954] mb-2">DevOps Engineer</h4>
+          <p className="text-gray-300">I developed “Endybot,” an automation tool that reduced managerial overhead, and optimized cloud infrastructure by deploying containerized applications on AWS. I enhanced CI/CD pipelines, automated infrastructure provisioning, and maintained Kubernetes deployments for high availability and efficiency.</p>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {["Slack Bot", "AWS EKS", "AWS ECS", "Docker", "Kubernetes", "GitHub Actions", "Terraform", "Helm", "CI/CD", "Infrastructure Automation", "Cloud Computing"].map((tag, index) => (
+              <span key={index} className="bg-[#282828] text-gray-300 text-xs px-2 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="bg-[#181818] p-6 rounded-lg">
           <div className="flex justify-between mb-2">
-            <h3 className="font-bold text-white">Previous Company</h3>
-            <span className="text-gray-400">2018 - 2020</span>
+            <h3 className="font-bold text-white">RideStream</h3>
+            <span className="text-gray-400">March 2020 - March 2022</span>
           </div>
-          <h4 className="text-[#1DB954] mb-2">Junior Position</h4>
-          <p className="text-gray-300">
-            Description of your role, responsibilities, and key achievements. Be
-            sure to highlight specific projects and the impact your work had.
+          <h4 className="text-[#1DB954] mb-2">Full-Stack Software Engineer</h4>
+          <p className="text-gray-300">I played a key role in developing a mobile app, building core features with React Native and integrating real-time data pipelines with AWS. I created playlist functionality, a driver dashboard, and geo-referenced ad targeting while ensuring compliance with data privacy regulations.
           </p>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {["React Native", "AWS S3", "AWS Lambda", "DynamoDB", "Real-Time Data Pipelines", "Geo-Referencing", "Mobile Development", "In-App Playlists", "Ad Tech", "GDPR Compliance"].map((tag, index) => (
+              <span key={index} className="bg-[#282828] text-gray-300 text-xs px-2 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -101,13 +127,12 @@ export default function About() {
 
         <div className="bg-[#181818] p-6 rounded-lg">
           <div className="flex justify-between mb-2">
-            <h3 className="font-bold text-white">University Name</h3>
-            <span className="text-gray-400">2014 - 2018</span>
+            <h3 className="font-bold text-white">California State University, Chico</h3>
+            <span className="text-gray-400">2021 - 2024</span>
           </div>
-          <h4 className="text-[#1DB954] mb-2">Degree in Relevant Field</h4>
+          <h4 className="text-[#1DB954] mb-2">B.S. Computer Science</h4>
           <p className="text-gray-300">
-            Brief description of your studies, relevant coursework, and any
-            honors or special achievements.
+          Gotta figure out tf ima put on this jawn
           </p>
         </div>
       </div>

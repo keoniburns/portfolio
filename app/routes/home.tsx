@@ -35,14 +35,20 @@ export default function Home() {
 
   // Filter handler function
   const handleFilterChange = (filter: FilterCategory) => {
-    // First store the previous active filter before updating
+    // Store the previous active filter before updating
     const previousFilter = activeFilter;
 
-    // Then update state
+    // Update state
     setActiveFilter(filter);
 
     // Animate the content sections
     const sections = document.querySelectorAll(".content-section");
+
+    // Clear any ongoing animations first
+    sections.forEach((section) => {
+      // Stop any ongoing animations
+      (section as HTMLElement).getAnimations().forEach(animation => animation.cancel());
+    });
 
     // First animate all sections out
     sections.forEach((section) => {
@@ -51,29 +57,43 @@ export default function Home() {
 
     // Then animate the visible section in
     setTimeout(() => {
-      // When switching to "all", make sure all sections are accessible first
+      // When switching to "all", make sure all sections are properly reset and visible
       if (filter === "all") {
-        // Find all sections that might still be hidden in the DOM
+        // Find all sections
         const allSections = document.querySelectorAll(
           ".projects-section, .skills-section, .experience-section"
         );
+        
+        // Reset all sections to a clean state first
         allSections.forEach((section) => {
-          // Check which type of section it is
-          (section as HTMLElement).style.display = "grid";
-
-          (section as HTMLElement).style.opacity = "0";
+          const el = section as HTMLElement;
+          el.style.display = "grid";
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)"; // Reset y position
         });
 
         // Then animate them in with staggered timing
-        sections.forEach((section, index) => {
-          animate(
-            section,
-            { opacity: 1, y: 0 },
-            { duration: 0.5, delay: 0.1 * index }
-          );
-        });
+        setTimeout(() => {
+          sections.forEach((section, index) => {
+            animate(
+              section,
+              { opacity: 1, y: 0 },
+              { duration: 0.5, delay: 0.1 * index }
+            );
+          });
+        }, 50); // Small delay to ensure reset is applied
       } else {
-        // For specific filter, only animate the target section
+        // For specific filter, first make sure only the target is visible
+        sections.forEach((section) => {
+          const el = section as HTMLElement;
+          if (section.classList.contains(`${filter}-section`)) {
+            el.style.display = "grid";
+          } else {
+            el.style.display = "none";
+          }
+        });
+
+        // Then animate the target section
         const visibleSection = document.querySelector(`.${filter}-section`);
         if (visibleSection) {
           animate(
@@ -255,7 +275,7 @@ export default function Home() {
             <div className="bg-[#181818] p-4 rounded-lg hover:bg-[#282828] transition-all group cursor-pointer">
               <div className="relative mb-4">
                 <img
-                  src="../../public/briefcase-icon.svg"
+                  src="/briefcase-icon.svg"
                   alt="Daily Mix 1"
                   className="w-full aspect-square object-cover rounded-md shadow-lg"
                 />
@@ -285,7 +305,7 @@ export default function Home() {
             <div className="bg-[#181818] p-4 rounded-lg hover:bg-[#282828] transition-all group cursor-pointer">
               <div className="relative mb-4">
                 <img
-                  src="../../public/Liatrio.png"
+                  src="/Liatrio.png"
                   alt="Daily Mix 2"
                   className="w-full aspect-square object-cover rounded-md shadow-lg"
                 />
@@ -311,7 +331,7 @@ export default function Home() {
             <div className="bg-[#181818] p-4 rounded-lg hover:bg-[#282828] transition-all group cursor-pointer">
               <div className="relative mb-4">
                 <img
-                  src="../../public/RideStream.jpg"
+                  src="/RideStream.jpg"
                   alt="Daily Mix 3"
                   className="w-full aspect-square object-cover rounded-md shadow-lg"
                 />
