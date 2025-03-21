@@ -1,49 +1,176 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
+import { searchAll, type SearchResult } from "../services/searchService";
+import SearchResults from "./SearchResults";
 
 interface TopNavProps {
   onSearch?: (query: string) => void;
 }
 
 const TopNav: React.FC<TopNavProps> = ({ onSearch }) => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [canGoForward, setCanGoForward] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Set up click outside listener to close search results
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowResults(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Check browser history state on mount and update
+  useEffect(() => {
+    const updateNavState = () => {
+      setCanGoBack(window.history.length > 1);
+      setCanGoForward(!!window.history.state?.forward?.length);
+    };
+
+    // Initial check
+    updateNavState();
+
+    // Listen for history changes
+    window.addEventListener("popstate", updateNavState);
+
+    return () => {
+      window.removeEventListener("popstate", updateNavState);
+    };
+  }, []);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Call parent's onSearch if provided
     if (onSearch) {
-      onSearch(e.target.value);
+      onSearch(query);
+    }
+
+    // Perform global search
+    if (query.trim()) {
+      const results = searchAll(query, 10); // Limit to 10 results per category
+      setSearchResults(results);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
+
+  // Handle navigation with browser history
+  const goBack = () => {
+    navigate(-1); // Go back one page in history
+    setCanGoForward(true); // We'll have a forward history after going back
+  };
+
+  const goForward = () => {
+    navigate(1); // Go forward one page in history
+    // Update state will happen automatically via the popstate event
+  };
+
+  const handleFocus = () => {
+    if (searchQuery.trim()) {
+      setShowResults(true);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Close results on escape
+    if (e.key === "Escape") {
+      setShowResults(false);
+      inputRef.current?.blur();
+    }
+  };
+
+  const handleResultClick = () => {
+    setShowResults(false);
+    setSearchQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   };
 
   return (
     <div className="bg-[#121212] p-4 flex items-center justify-between sticky top-0 z-10">
       <div className="flex space-x-4">
-        {/* Navigation arrows */}
-        <button className="bg-black rounded-full p-1 text-white opacity-70 hover:opacity-100">
+        {/* Skip/Replay buttons - replaced from Playbar */}
+        <button
+          className={`bg-black rounded-full p-1 ${
+            canGoBack
+              ? "text-white opacity-70 hover:opacity-100"
+              : "text-gray-600 cursor-not-allowed"
+          }`}
+          onClick={goBack}
+          aria-label="Go back"
+          disabled={!canGoBack}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
             viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
+            stroke="currentColor"
           >
-            <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
-        <button className="bg-black rounded-full p-1 text-white opacity-70 hover:opacity-100">
+        <button
+          className={`bg-black rounded-full p-1 ${
+            canGoForward
+              ? "text-white opacity-70 hover:opacity-100"
+              : "text-gray-600 cursor-not-allowed"
+          }`}
+          onClick={goForward}
+          aria-label="Go forward"
+          disabled={!canGoForward}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
             viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
+            stroke="currentColor"
           >
-            <path d="M5.055 7.06c-1.25-.714-2.805.19-2.805 1.628v8.123c0 1.44 1.555 2.342 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.342 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L14.805 7.06C13.555 6.346 12 7.25 12 8.688v2.34L5.055 7.06z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
       </div>
 
-      {/* Search bar */}
-      <div className="relative flex-1 max-w-xl mx-4">
+      {/* Search bar with dropdown results */}
+      <div className="relative flex-1 max-w-xl mx-4" ref={searchRef}>
         <input
+          ref={inputRef}
           type="text"
-          placeholder="What do you want to explore?"
+          placeholder="Search projects, skills, experience..."
           className="w-full py-2 px-10 bg-[#242424] text-white rounded-full focus:outline-none focus:ring-2 focus:ring-[#1DB954]"
           onChange={handleSearch}
+          onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
         />
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -59,6 +186,44 @@ const TopNav: React.FC<TopNavProps> = ({ onSearch }) => {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
+
+        {/* Clear button */}
+        {searchQuery && (
+          <button
+            className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
+            onClick={() => {
+              setSearchQuery("");
+              setSearchResults([]);
+              setShowResults(false);
+              if (inputRef.current) {
+                inputRef.current.value = "";
+                inputRef.current.focus();
+              }
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* Search results dropdown */}
+        <SearchResults
+          results={searchResults}
+          onResultClick={handleResultClick}
+          isVisible={showResults}
+        />
       </div>
 
       {/* User profile */}

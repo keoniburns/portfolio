@@ -41,69 +41,65 @@ export default function Home() {
     // Update state
     setActiveFilter(filter);
 
-    // Animate the content sections
+    // Find all content sections once
     const sections = document.querySelectorAll(".content-section");
 
-    // Clear any ongoing animations first
+    // Cancel any ongoing animations
     sections.forEach((section) => {
-      // Stop any ongoing animations
-      (section as HTMLElement).getAnimations().forEach(animation => animation.cancel());
+      (section as HTMLElement)
+        .getAnimations()
+        .forEach((animation) => animation.cancel());
     });
 
-    // First animate all sections out
-    sections.forEach((section) => {
-      animate(section, { opacity: 0, y: 20 }, { duration: 0.3 });
-    });
+    if (filter === "all") {
+      // For "all" filter, make all sections visible first
+      sections.forEach((section) => {
+        const el = section as HTMLElement;
+        // Preserve original display type (grid for projects, block for others)
+        if (section.classList.contains("projects-section")) {
+          el.style.display = "grid"; // Restore grid display for projects
+        } else {
+          el.style.display = "block"; // Use block for others
+        }
+      });
 
-    // Then animate the visible section in
-    setTimeout(() => {
-      // When switching to "all", make sure all sections are properly reset and visible
-      if (filter === "all") {
-        // Find all sections
-        const allSections = document.querySelectorAll(
-          ".projects-section, .skills-section, .experience-section"
+      // Then animate them in with stagger
+      sections.forEach((section, index) => {
+        animate(
+          section,
+          { opacity: 1, y: 0 },
+          { duration: 0.4, delay: 0.08 * index }
         );
-        
-        // Reset all sections to a clean state first
-        allSections.forEach((section) => {
-          const el = section as HTMLElement;
-          el.style.display = "grid";
-          el.style.opacity = "0";
-          el.style.transform = "translateY(20px)"; // Reset y position
-        });
+      });
+    } else {
+      // For specific filters, handle differently
+      sections.forEach((section) => {
+        const el = section as HTMLElement;
 
-        // Then animate them in with staggered timing
-        setTimeout(() => {
-          sections.forEach((section, index) => {
-            animate(
-              section,
-              { opacity: 1, y: 0 },
-              { duration: 0.5, delay: 0.1 * index }
-            );
-          });
-        }, 50); // Small delay to ensure reset is applied
-      } else {
-        // For specific filter, first make sure only the target is visible
-        sections.forEach((section) => {
-          const el = section as HTMLElement;
-          if (section.classList.contains(`${filter}-section`)) {
-            el.style.display = "grid";
+        if (section.classList.contains(`${filter}-section`)) {
+          // Show and animate in the matching section
+          // Preserve the correct display type
+          if (filter === "projects") {
+            el.style.display = "grid"; // Use grid for projects
           } else {
-            el.style.display = "none";
+            el.style.display = "block"; // Use block for others
           }
-        });
-
-        // Then animate the target section
-        const visibleSection = document.querySelector(`.${filter}-section`);
-        if (visibleSection) {
+          animate(section, { opacity: 1, y: 0 }, { duration: 0.4 });
+        } else {
+          // Animate out non-matching sections, then hide them
           animate(
-            visibleSection,
-            { opacity: 1, y: 0 },
-            { duration: 0.5, delay: 0.1 }
+            section,
+            { opacity: 0, y: 20 },
+            {
+              duration: 0.3,
+              onComplete: () => {
+                el.style.display = "none";
+              },
+            }
           );
         }
-      }
-    }, 300);
+      });
+    }
 
     // Animate the active filter indicator
     if (filterIndicatorRef.current && filterContainerRef.current) {
