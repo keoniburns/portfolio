@@ -22,7 +22,7 @@ export const projects: Project[] = [
     image: "/Parallel.jpg",
     tags: ["C++", "MPI", "OpenMP", "Audio Processing", "Parallel Computing"],
     link: "/projects/1",
-    github: "https://github.com/yourusername/phase-vocoder",
+    github: "https://github.com/keoniburns/parallelized-phase-vocoder",
   },
   {
     id: "2",
@@ -33,6 +33,7 @@ export const projects: Project[] = [
     image: "/p2.jpg",
     tags: ["Node.js", "Slack API", "MongoDB", "NLP", "AWS Lambda"],
     link: "/projects/2",
+    github:"",
     demoUrl: "https://endybot-demo.example.com",
   },
   {
@@ -51,7 +52,7 @@ export const projects: Project[] = [
       "Motion Sensors",
     ],
     link: "/projects/3",
-    github: "https://github.com/yourusername/stroke-corrector",
+    github: "https://github.com/keoniburns/stroke-corrector",
   },
   {
     id: "4",
@@ -63,7 +64,7 @@ export const projects: Project[] = [
     image: "/p4.jpg",
     tags: ["Electron", "React", "TypeScript", "IndexedDB", "REST APIs"],
     link: "/projects/4",
-    github: "https://github.com/yourusername/daystart",
+    github: "https://github.com/keoniburns/daystart",
     demoUrl: "https://daystart-demo.example.com",
   },
 ]; 

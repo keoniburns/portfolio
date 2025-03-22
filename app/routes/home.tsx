@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card } from "../components/Layout";
 import constants from "../constants";
 import { animate } from "motion";
+// import { projects } from "../data/projects";
+import type { Project } from "../data/projects";
+import { projects } from "../data/projects";
+import ProjectModal from "../components/ProjectModal";
 
 // Type assertion for constants to address TypeScript error
 const typedConstants = constants as {
@@ -32,8 +36,24 @@ export default function Home() {
   const [activeFilter, setActiveFilter] = useState<FilterCategory>("all");
   const filterIndicatorRef = useRef<HTMLDivElement | null>(null);
   const filterContainerRef = useRef<HTMLDivElement | null>(null);
+  
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Filter handler function
+  // Function to open modal with project data
+  const openProjectModal = (project: Project) => {
+    setSelectedProject(project);
+    setModalOpen(true);
+  };
+
+  // Function to close modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedProject(null);
+  };
+
+  // Filter handler function - using CSS transitions instead of animate
   const handleFilterChange = (filter: FilterCategory) => {
     // Store the previous active filter before updating
     const previousFilter = activeFilter;
@@ -46,30 +66,38 @@ export default function Home() {
 
     // Cancel any ongoing animations
     sections.forEach((section) => {
-      (section as HTMLElement)
-        .getAnimations()
-        .forEach((animation) => animation.cancel());
+      const el = section as HTMLElement;
+      // Clear any transition delays
+      el.style.transitionDelay = '';
     });
 
     if (filter === "all") {
       // For "all" filter, make all sections visible first
-      sections.forEach((section) => {
+      sections.forEach((section, index) => {
         const el = section as HTMLElement;
-        // Preserve original display type (grid for projects, block for others)
+        // Set initial opacity and transform for animation
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        
+        // Preserve original display type
         if (section.classList.contains("projects-section")) {
           el.style.display = "grid"; // Restore grid display for projects
         } else {
           el.style.display = "block"; // Use block for others
         }
-      });
-
-      // Then animate them in with stagger
-      sections.forEach((section, index) => {
-        animate(
-          section,
-          { opacity: 1, y: 0 },
-          { duration: 0.4, delay: 0.08 * index }
-        );
+        
+        // Apply staggered delays
+        const delay = 0.08 * index;
+        el.style.transitionDelay = `${delay}s`;
+        
+        // Force a reflow to ensure the initial state is applied
+        void el.offsetWidth;
+        
+        // Then set the final state to trigger animation
+        setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, 10);
       });
     } else {
       // For specific filters, handle differently
@@ -78,25 +106,31 @@ export default function Home() {
 
         if (section.classList.contains(`${filter}-section`)) {
           // Show and animate in the matching section
-          // Preserve the correct display type
           if (filter === "projects") {
             el.style.display = "grid"; // Use grid for projects
           } else {
             el.style.display = "block"; // Use block for others
           }
-          animate(section, { opacity: 1, y: 0 }, { duration: 0.4 });
+          
+          // Set initial state
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          
+          // Force a reflow
+          void el.offsetWidth;
+          
+          // Apply final state
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
         } else {
           // Animate out non-matching sections, then hide them
-          animate(
-            section,
-            { opacity: 0, y: 20 },
-            {
-              duration: 0.3,
-              onComplete: () => {
-                el.style.display = "none";
-              },
-            }
-          );
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          
+          // Hide after transition completes
+          setTimeout(() => {
+            el.style.display = "none";
+          }, 300);
         }
       });
     }
@@ -109,7 +143,6 @@ export default function Home() {
         const containerRect =
           filterContainerRef.current.getBoundingClientRect();
 
-        // Use style properties instead of animate for the indicator
         filterIndicatorRef.current.style.width = `${rect.width}px`;
         filterIndicatorRef.current.style.left = `${
           rect.left - containerRect.left
@@ -125,7 +158,7 @@ export default function Home() {
     return activeFilter === "all" || categories.includes(activeFilter);
   };
 
-  // Initialize animations on component mount
+  // Initialize filter indicator and initial content transitions
   useEffect(() => {
     // Create the filter indicator
     if (filterContainerRef.current) {
@@ -146,14 +179,19 @@ export default function Home() {
       }
     }
 
-    // Initial animations for content sections
+    // Initial animations for content sections using CSS transitions
     const sections = document.querySelectorAll(".content-section");
     sections.forEach((section, index) => {
-      animate(
-        section,
-        { opacity: 1, y: 0 },
-        { duration: 0.5, delay: 0.1 * index }
-      );
+      const el = section as HTMLElement;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+      el.style.transitionDelay = `${0.1 * index}s`;
+      
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 10);
     });
   }, []);
 
@@ -209,9 +247,10 @@ export default function Home() {
           Experience
         </button>
       </div>
-      {/* Featured grid section - Projects */}
+      
+      {/* Projects section */}
       {isVisible(["projects"]) && (
-        <section className="content-section projects-section mb-10">
+        <section className="content-section projects-section mb-10 transition-all duration-300">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">
               Projects Made For You
@@ -224,36 +263,44 @@ export default function Home() {
             </a>
           </div>
           <div className="content-section projects-section grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            <Card
-              title="Parallelized Phase Vocoder"
-              description="Parallel programming on distributed system"
-              image="/Parallel.jpg"
-              link="/projects/1"
-            />
-            <Card
-              title="EndyBot"
-              description="SlackBot for post aggregation and distribution"
-              image="/p2.jpg"
-              link="/projects/2"
-            />
-            <Card
-              title="Stroke Corrector"
-              description="an embedded system to help correct stroke consistency for pool players "
-              image="/P3.jpg"
-              link="/projects/3"
-            />
-            <Card
-              title="DayStart"
-              description="A desktop application that provides a single place to journal, read articles, and leetcode"
-              image="/p4.jpg"
-              link="/projects/4"
-            />
+            {projects.map((project) => (
+              <div 
+                key={project.id}
+                className="bg-[#181818] rounded-lg p-4 hover:bg-[#282828] transition-all duration-300 cursor-pointer group"
+                onClick={() => openProjectModal(project)}
+              >
+                <div className="relative mb-3 overflow-hidden rounded-md">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full aspect-square object-cover transform group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute bottom-2 right-2 bg-[#1DB954] rounded-full p-2.5 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all shadow-lg">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="font-bold text-white mb-1 truncate">{project.title}</h3>
+                <p className="text-gray-400 text-sm">{project.description}</p>
+              </div>
+            ))}
           </div>
         </section>
       )}
+      
       {/* Experience section */}
       {isVisible(["experience"]) && (
-        <section className="content-section experience-section mb-10">
+        <section className="content-section experience-section mb-10 transition-all duration-300">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">
               Experienced By Keoni Burns
@@ -297,7 +344,7 @@ export default function Home() {
                 Frontend, React, and UI/UX skills
               </p>
             </div>
-            {/* Other experience cards */}
+            {/* Other experience cards - kept as is */}
             <div className="bg-[#181818] p-4 rounded-lg hover:bg-[#282828] transition-all group cursor-pointer">
               <div className="relative mb-4">
                 <img
@@ -354,9 +401,10 @@ export default function Home() {
           </div>
         </section>
       )}
-      {/* Skills section */}
+      
+      {/* Skills section - kept as is */}
       {isVisible(["skills"]) && (
-        <section className="content-section skills-section mb-10">
+        <section className="content-section skills-section mb-10 transition-all duration-300">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">
               Skills & Expertise
@@ -436,37 +484,15 @@ export default function Home() {
           </div>
         </section>
       )}
-      {/* Recently viewed - always visible */}
-      {/* <section className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-white">Recently viewed</h2>
-          <a href="/history" className="text-sm text-gray-400 hover:text-white">
-            Show all
-          </a>
-        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="bg-[#181818] p-4 rounded-lg hover:bg-[#282828] transition-all group cursor-pointer"
-            >
-              <div className="relative mb-4">
-                <img
-                  src={`https://via.placeholder.com/150?text=Project${i}`}
-                  alt={`Recent ${i}`}
-                  className="w-full aspect-square object-cover rounded-md shadow-lg"
-                />
-              </div>
-              <h3 className="font-bold text-white text-sm truncate">
-                Recent Project {i}
-              </h3>
-              <p className="text-gray-400 text-xs">Last viewed 2d ago</p>
-            </div>
-          ))}
-        </div>
-      </section>
-      */}
+      {/* Project Modal */}
+      {selectedProject && (
+        <ProjectModal 
+          project={selectedProject} 
+          isOpen={modalOpen} 
+          onClose={closeModal} 
+        />
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from "react-router";
 import { Card } from "../components/Layout";
 import { projects } from "../data/projects";
 import type { Project } from "../data/projects";
+import ProjectModal from "../components/ProjectModal";
 
 // Define filter categories
 type FilterCategory = "all" | "web" | "mobile" | "embedded" | "parallel";
@@ -27,6 +28,10 @@ export default function Projects() {
   const [activeFilter, setActiveFilter] =
     useState<FilterCategory>(initialFilter);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
+
+  // Add state for modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // Update URL when filters change
   useEffect(() => {
@@ -62,6 +67,18 @@ export default function Projects() {
     if (!searchQuery) {
       setIsSearchVisible(false);
     }
+  };
+
+  // Function to open modal with project data
+  const openProjectModal = (project: Project) => {
+    setSelectedProject(project);
+    setModalOpen(true);
+  };
+
+  // Function to close modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedProject(null);
   };
 
   // Filter projects based on category and search query
@@ -272,7 +289,8 @@ export default function Projects() {
           {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className="bg-[#181818] rounded-lg overflow-hidden hover:bg-[#282828] transition-all"
+              className="bg-[#181818] rounded-lg overflow-hidden hover:bg-[#282828] transition-all cursor-pointer"
+              onClick={() => openProjectModal(project)}
             >
               {/* Smaller aspect ratio for images */}
               <div className="relative aspect-[16/9]">
@@ -378,6 +396,15 @@ export default function Projects() {
             Try adjusting your search or filter criteria.
           </p>
         </div>
+      )}
+
+      {/* Project Modal */}
+      {selectedProject && (
+        <ProjectModal 
+          project={selectedProject} 
+          isOpen={modalOpen} 
+          onClose={closeModal} 
+        />
       )}
 
       {/* Back to home link */}
