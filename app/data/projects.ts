@@ -33,7 +33,7 @@ export const projects: Project[] = [
     image: "/p2.jpg",
     tags: ["Node.js", "Slack API", "MongoDB", "NLP", "AWS Lambda"],
     link: "/projects/2",
-    github:"",
+    github:"https://github.com/liatrio/endyBot",
     demoUrl: "https://endybot-demo.example.com",
   },
   {
@@ -64,7 +64,27 @@ export const projects: Project[] = [
     image: "/p4.jpg",
     tags: ["Electron", "React", "TypeScript", "IndexedDB", "REST APIs"],
     link: "/projects/4",
-    github: "https://github.com/keoniburns/daystart",
+    github: "https://github.com/keoniburns/productivity_hub",
     demoUrl: "https://daystart-demo.example.com",
   },
+  {
+    id: '5',
+    title: "C++ CNN",
+    description: "A convulitonal nerual network built from scratch in c++",
+    detailedDescription:
+      "A project for my machine learning course while at chico. The goal was to build the forward pass for a convulitional neural network.",
+    image: "/CNN.jpg",
+    tags: ["C++", "Machine Learning"],
+    github: ""
+  },
+  {
+    id: '6',
+    title: "Bipedal Locomotion with reinforcement learning",
+    description: "making a humanoid learn how to walk using reinforcement learning",
+    detailedDescription:
+      "The project utilizes transfer learning and simulation software to help train a rigid body to learn how to walk. the simulation environment used was mujoco",
+    image: "/bipeda.jpg",
+    tags: ["Machine Learning", "python", "Mujoco", "Python", "Numpy", "Tensorflow"],
+    github: ""
+  }
 ]; 

@@ -82,7 +82,7 @@ export const Card: React.FC<CardProps> = ({
         <img
           src={image}
           alt={title}
-          className="w-full aspect-square object-cover rounded-md shadow-lg"
+          className="w-full aspect-square object-cover object-center rounded-md shadow-lg"
         />
         <div className="absolute bottom-2 right-2 bg-[#1DB954] rounded-full p-3 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all shadow-lg">
           <svg

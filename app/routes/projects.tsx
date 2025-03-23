@@ -292,12 +292,12 @@ export default function Projects() {
               className="bg-[#181818] rounded-lg overflow-hidden hover:bg-[#282828] transition-all cursor-pointer"
               onClick={() => openProjectModal(project)}
             >
-              {/* Smaller aspect ratio for images */}
+              {/* Standardized image display for project cards */}
               <div className="relative aspect-[16/9]">
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
               <div className="p-4">

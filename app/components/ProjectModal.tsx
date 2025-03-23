@@ -82,12 +82,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onClose })
         className="bg-[#181818] rounded-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto transition-all duration-200 ease-out"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header with Image */}
+        {/* Modal Header with Image - Standardized display */}
         <div className="relative h-72 sm:h-96 md:h-[400px] overflow-hidden">
           <img 
             src={project.image} 
             alt={project.title}
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#181818] to-transparent"></div>
           
@@ -143,19 +143,19 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onClose })
               </a>
             )}
             
-            {project.github && (
-              <a 
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 bg-[#1DB954] hover:bg-opacity-80 text-white px-6 py-3 rounded-full transition-colors text-base font-medium"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                </svg>
-                Live Demo
-              </a>
-            )}
+            {/* {project.github && (
+            //   <a 
+            //     href={project.github}
+            //     target="_blank"
+            //     rel="noopener noreferrer"
+            //     className="flex items-center gap-3 bg-[#1DB954] hover:bg-opacity-80 text-white px-6 py-3 rounded-full transition-colors text-base font-medium"
+            //   >
+            //     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            //       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            //     </svg>
+            //     Live Demo
+            //   </a>
+            // )} */}
             
             <a 
               href={project.github}

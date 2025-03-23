@@ -41,6 +41,11 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  // Add refs and state for carousel
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  
   // Function to open modal with project data
   const openProjectModal = (project: Project) => {
     setSelectedProject(project);
@@ -195,6 +200,51 @@ export default function Home() {
     });
   }, []);
 
+  // Update the scrollCarousel function to scroll by one project width
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      // Calculate the width of a single project card including gap
+      const itemWidth = carouselRef.current.clientWidth / 4; // Width of one visible item
+      
+      // Get current scroll position
+      const currentScroll = carouselRef.current.scrollLeft;
+      
+      // Calculate the new scroll position
+      const newScroll = direction === 'left' 
+        ? currentScroll - itemWidth
+        : currentScroll + itemWidth;
+      
+      // Scroll to the new position with smooth animation
+      carouselRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  // Update arrow visibility based on scroll position
+  const handleCarouselScroll = () => {
+    if (!carouselRef.current) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10); // 10px buffer
+  };
+  
+  // Add scroll event listener
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (carousel) {
+      carousel.addEventListener('scroll', handleCarouselScroll);
+      // Check initial state
+      handleCarouselScroll();
+      
+      return () => {
+        carousel.removeEventListener('scroll', handleCarouselScroll);
+      };
+    }
+  }, [activeFilter]); // Re-run when filter changes
+
   return (
     <>
       {/* Filter tabs */}
@@ -248,7 +298,7 @@ export default function Home() {
         </button>
       </div>
       
-      {/* Projects section */}
+      {/* Projects section with carousel - scrolling one project at a time */}
       {isVisible(["projects"]) && (
         <section className="content-section projects-section mb-10 transition-all duration-300">
           <div className="flex justify-between items-center mb-4">
@@ -262,38 +312,107 @@ export default function Home() {
               Show all
             </a>
           </div>
-          <div className="content-section projects-section grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {projects.map((project) => (
-              <div 
-                key={project.id}
-                className="bg-[#181818] rounded-lg p-4 hover:bg-[#282828] transition-all duration-300 cursor-pointer group"
-                onClick={() => openProjectModal(project)}
+          
+          {/* Project Carousel - precise scrolling */}
+          <div className="relative">
+            {/* Left arrow */}
+            {showLeftArrow && (
+              <button 
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 rounded-full p-2 text-white transform -translate-x-1/2 hover:bg-black/80 transition-colors focus:outline-none group"
+                onClick={() => scrollCarousel('left')}
+                aria-label="Scroll left"
               >
-                <div className="relative mb-3 overflow-hidden rounded-md">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full aspect-square object-cover transform group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute bottom-2 right-2 bg-[#1DB954] rounded-full p-2.5 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all shadow-lg">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
-                        clipRule="evenodd"
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            
+            {/* Carousel container with constrained width to show exactly 4 items */}
+            <div className="relative overflow-hidden" style={{ width: '100%' }}>
+              <div 
+                ref={carouselRef}
+                className="overflow-x-auto scrollbar-hide flex gap-6 pb-4 scroll-smooth snap-x"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                onScroll={handleCarouselScroll}
+              >
+                {projects.map((project) => (
+                  <div 
+                    key={project.id}
+                    className="bg-[#181818] rounded-lg p-4 hover:bg-[#282828] transition-all duration-300 cursor-pointer group flex-shrink-0 snap-start"
+                    style={{ width: 'calc(25% - 18px)', minWidth: '240px' }}
+                    onClick={() => openProjectModal(project)}
+                  >
+                    <div className="relative mb-3 overflow-hidden rounded-md">
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full aspect-square object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                       />
-                    </svg>
+                      <div className="absolute bottom-2 right-2 bg-[#1DB954] rounded-full p-2.5 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all shadow-lg">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="font-bold text-white mb-1 truncate">{project.title}</h3>
+                    <p className="text-gray-400 text-sm line-clamp-2">{project.description}</p>
                   </div>
-                </div>
-                <h3 className="font-bold text-white mb-1 truncate">{project.title}</h3>
-                <p className="text-gray-400 text-sm">{project.description}</p>
+                ))}
               </div>
-            ))}
+            </div>
+            
+            {/* Right arrow */}
+            {showRightArrow && (
+              <button 
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/60 rounded-full p-2 text-white transform translate-x-1/2 hover:bg-black/80 transition-colors focus:outline-none group"
+                onClick={() => scrollCarousel('right')}
+                aria-label="Scroll right"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+            
+            {/* Carousel indicators - one per project */}
+            {projects.length > 4 && (
+              <div className="flex justify-center mt-4 gap-2">
+                {projects.map((_, index) => {
+                  // Only create dots for start positions (every 4th project)
+                  if (index % 4 !== 0) return null;
+                  
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        if (carouselRef.current) {
+                          // Calculate the position to scroll to (based on item width)
+                          const itemWidth = carouselRef.current.clientWidth / 4;
+                          const scrollAmount = (itemWidth * index) / 4 * 4;
+                          
+                          carouselRef.current.scrollTo({
+                            left: scrollAmount,
+                            behavior: 'smooth'
+                          });
+                        }
+                      }}
+                      className="w-2 h-2 rounded-full bg-gray-600 hover:bg-gray-400 focus:outline-none focus:bg-white transition-colors"
+                      aria-label={`Go to project ${index + 1}`}
+                    />
+                  );
+                }).filter(Boolean)}
+              </div>
+            )}
           </div>
         </section>
       )}
